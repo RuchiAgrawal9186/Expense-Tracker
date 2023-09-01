@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link ,useNavigate} from 'react-router-dom'
+import {url} from "../url.js"
+import axios from "axios"
 
 const Register = () => {
 
@@ -7,12 +9,31 @@ const Register = () => {
     const [email,setemail] = useState("")
     const [password,setpassword]=useState("")
 
+    const navigate = useNavigate()
+
+    // useEffect(()=>{
+    //   if(localStorage.getItem("user"))
+    //   {
+    //     navigate("/")
+    //   }
+    // },[navigate])
+
     const handleSubmit = (e) =>{
         e.preventDefault()
 
         let obj = {
             name,email,password
         }
+        axios.post(`${url}/users/register`,obj)
+        .then((res)=>{
+          console.log(res.data)
+          console.log("register done")
+          navigate("/login")
+        })
+        .catch((err)=>{
+          console.log("not register")
+          console.log(err)
+        })
         console.log(obj)
 
     }

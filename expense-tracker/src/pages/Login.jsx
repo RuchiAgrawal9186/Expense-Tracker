@@ -1,25 +1,73 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { url } from "../url.js";
+import axios from "axios";
+import Spinner from '../components/Spinner.jsx';
 
 const Login = () => {
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+
+  const [loading,setloading]=useState(false)
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      navigate("/");
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const obj = {
+      email,
+      password
+    };
+
+    try {
+      setloading(true)
+      const response = await axios.post(`${url}/users/login`, obj);
+      const data = response.data;
+      console.log(data);
+      console.log("login done");
+      localStorage.setItem("user", JSON.stringify({ ...data.user, password: "" }));
+      navigate("/");
+      setloading(false)
+    } catch (error) {
+      setloading(false)
+      console.log("not login");
+      console.log(error);
+    }
+  };
+
+  if (localStorage.getItem("user")) {
+    // If user is logged in, no need to render the login form
+    return null;
+  }
+
   return (
     <>
-    <div className='login-page'>
-        <h2>Login form</h2>
-     <form action="">
+    {loading ? <Spinner></Spinner> : 
+      <div className='login-page'>
         
-        <input type="email" name="email" placeholder='enter a email'/>
-        <br />
-        <input type="password" name="password" placeholder='enter a password'/>
-        <br />
-        <button>Submit</button>
-        <br/>
-        new User ? click here to <Link to='/register'>Register</Link>
-
-     </form>
-    </div>
+        <h2>Login form</h2>
+        <form action="" onSubmit={handleSubmit}>
+          <input type="email" name="email" value={email} placeholder='enter an email' style={{ width: "100%" }} onChange={(e) => setemail(e.target.value)} />
+          <br />
+          <input type="password" name="password" value={password} placeholder='enter a password' style={{ width: "100%" }} onChange={(e) => setpassword(e.target.value)} />
+          <br />
+          <button style={{ width: "90%" }}>Submit</button>
+          <br />
+          <br />
+          New User? Click here to <Link to='/register'>Register</Link>
+        </form>
+      </div>
+    }
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
