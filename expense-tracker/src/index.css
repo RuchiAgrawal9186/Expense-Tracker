@@ -17,3 +17,18 @@ code {
   border: 1px solid black;
 
 }
+.login-page{
+  margin: auto;
+  width: 30%;
+  padding: 10px;
+  border: 1px solid black;
+
+}
+
+.filters{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  box-shadow:  0 0 3px gray;
+}
