@@ -1,16 +1,23 @@
 import React,{useEffect, useState} from 'react'
-import {Modal,Form, Select, Input, message,Table} from "antd"
+import {Modal,Form, Select, Input, message,Table,DatePicker} from "antd"
+import moment from "moment"
 import Header from '../components/Layout/Header'
 import Footer from '../components/Layout/Footer'
+
 import axios from 'axios'
 import { url } from '../url'
 import Spinner from '../components/Spinner'
-
+const {RangePicker} = DatePicker;
 
 const HomePage = () => {
   const [showModel,setshowModel]=useState(false)
   const [Loading,setLoading]=useState(false)
   const [alltranscrion,setalltransaction] = useState([])
+
+  const [frequency,setfrequency]=useState("7")
+
+  const [selectedDate,setselectedDate] = useState([])
+  const [type,settype]=useState("all")
 
   // table data 
 
@@ -18,6 +25,7 @@ const HomePage = () => {
     {
       title:"Date",
       dataIndex:"date",
+      render:(text)=> <span>{moment(text).format("DD-MM-YYYY")}</span>
     },
     {
       title:"Amount",
@@ -42,25 +50,26 @@ const HomePage = () => {
 
   ]
 
-  const getAlltransaction = async()=>{
-    try {
-      const user = JSON.parse(localStorage.getItem("user"))
-      setLoading(true)
-      const res = await axios.post(`${url}/transaction/getall`, {userid:user._id})
-      setLoading(false)
-      setalltransaction(res.data)
-      console.log(res.data)
-
-      
-    } catch (error) {
-      console.log(error)
-      message.error("Fetch Issue with Transaction")
-    }
-  }
+  
 
   useEffect(()=>{
+    const getAlltransaction = async()=>{
+      try {
+        const user = JSON.parse(localStorage.getItem("user"))
+        setLoading(true)
+        const res = await axios.post(`${url}/transaction/getall`, {userid:user._id,frequency,selectedDate,type})
+        setLoading(false)
+        setalltransaction(res.data)
+        console.log(res.data)
+  
+        
+      } catch (error) {
+        console.log(error)
+        message.error("Fetch Issue with Transaction")
+      }
+    }
     getAlltransaction()
-  },[])
+  },[frequency,selectedDate,type])
 
   const handleSubmit = async(values) =>{
     try {
@@ -79,7 +88,25 @@ const HomePage = () => {
     {/* <h1>welcome to home page</h1> */}
     {Loading && <Spinner/>}
     <div className='filters'>
-      <div>range filters</div>
+      <div>
+        <h6>Select Frequency</h6>
+        <Select value={frequency} onChange={(values)=> setfrequency(values)}>
+            <Select.Option value="7">LAST 1 Week</Select.Option>
+            <Select.Option value="30">Last 1 Month</Select.Option>
+            <Select.Option value="365">Last 1 Year</Select.Option>
+            <Select.Option value="custom">custom</Select.Option>
+          </Select>
+         {frequency=="custom" && <RangePicker value={selectedDate} onChange={(values)=> setselectedDate(values)}></RangePicker>}
+      </div>
+      <div>
+        <h6>Select Type</h6>
+        <Select value={type} onChange={(values)=> settype(values)}>
+            <Select.Option value="all">ALL</Select.Option>
+            <Select.Option value="income">Income</Select.Option>
+            <Select.Option value="expense">Expense</Select.Option>
+          </Select>
+         {frequency=="custom" && <RangePicker value={selectedDate} onChange={(values)=> setselectedDate(values)}></RangePicker>}
+      </div>
       <div>
         <button className='btn btn-primary' onClick={()=> setshowModel(true)}>Add New</button>
       </div>
