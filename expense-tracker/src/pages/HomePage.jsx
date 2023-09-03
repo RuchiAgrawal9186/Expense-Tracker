@@ -1,7 +1,7 @@
 import React,{useEffect, useState} from 'react'
 import {Modal,Form, Select, Input, message,Table,DatePicker} from "antd"
 import moment from "moment"
-import {UnorderedListOutlined,AreaChartOutlined} from "@ant-design/icons"
+import {UnorderedListOutlined,AreaChartOutlined,EditOutlined,DeleteOutlined} from "@ant-design/icons"
 import axios from 'axios'
 import { url } from '../url'
 import Spinner from '../components/Spinner'
@@ -18,6 +18,10 @@ const HomePage = () => {
   const [selectedDate,setselectedDate] = useState([])
   const [type,settype]=useState("all")
   const [viewdata,setviewdata]=useState("table")
+
+  const [editable,seteditable]=useState(null)
+
+  
 
   // table data 
 
@@ -45,40 +49,92 @@ const HomePage = () => {
     },
     {
       title:"Actions",
+      render : (text,record)=> (
+        <div>
+          <EditOutlined onClick={()=> {
+             seteditable(record)
+             setshowModel(true)
+          }}></EditOutlined>
+          <DeleteOutlined className='mx-2' onClick={()=> {handleDelete(record)}}/>
+        </div>
+      )
 
     }
 
   ]
 
+  const getAlltransaction = async()=>{
+    try {
+      const user = JSON.parse(localStorage.getItem("user"))
+      setLoading(true)
+      const res = await axios.post(`${url}/transaction/getall`, {userid:user._id,frequency,selectedDate,type})
+      setLoading(false)
+      setalltransaction(res.data)
+      console.log(res.data)
+
+      
+    } catch (error) {
+      console.log(error)
+      message.error("Fetch Issue with Transaction")
+    }
+  }
+
   
 
   useEffect(()=>{
-    const getAlltransaction = async()=>{
-      try {
-        const user = JSON.parse(localStorage.getItem("user"))
-        setLoading(true)
-        const res = await axios.post(`${url}/transaction/getall`, {userid:user._id,frequency,selectedDate,type})
-        setLoading(false)
-        setalltransaction(res.data)
-        console.log(res.data)
-  
-        
-      } catch (error) {
-        console.log(error)
-        message.error("Fetch Issue with Transaction")
-      }
-    }
     getAlltransaction()
   },[frequency,selectedDate,type])
+
+  const handleDelete = async(record) =>{
+
+    try {
+      setLoading(true)
+      console.log("record",record)
+      await axios.delete(`${url}/transaction/delete`, {
+        data: { transactionId: record._id },
+      })
+        setLoading(false)
+        message.success("Transaction Deleted Successfully.")
+        getAlltransaction()
+
+      
+    } catch (error) {
+      setLoading(false)
+        message.error("Unable to delete.")
+      
+    }
+
+  }
 
   const handleSubmit = async(values) =>{
     try {
       const user = JSON.parse(localStorage.getItem("user"))
       setLoading(true)
-      await axios.post(`${url}/transaction/add`, {...values,userid:user._id})
-      setLoading(false)
-      message.success("Transaction Added Successfully.")
+
+      if(editable)
+      {
+        await axios.put(`${url}/transaction/edit`, {
+          payload:{
+            ...values,
+            userId:user._id
+          },
+          transactionId:editable._id
+
+        })
+        setLoading(false)
+      message.success("Transaction Updated Successfully.")
+      getAlltransaction()
+      }
+      else
+      {
+        await axios.post(`${url}/transaction/add`, {...values,userid:user._id})
+        setLoading(false)
+        message.success("Transaction Added Successfully.")
+        getAlltransaction()
+      }
+      
       setshowModel(false)
+      seteditable(null)
     } catch (error) {
       message.error("Fail to add Transaction")
     }
@@ -119,9 +175,9 @@ const HomePage = () => {
       {viewdata=="table" ? <Table columns={colums} dataSource={alltranscrion}/> : <Analytics alltransaction={alltranscrion}></Analytics>}
       
     </div>
-    <Modal title="Add Transaction" open={showModel} onCancel={()=> setshowModel(false)}
+    <Modal title={editable ? "Edit Transaction" : "Add Transaction"} open={showModel} onCancel={()=> setshowModel(false)}
     footer={false}>
-      <Form layout="vertical" onFinish={handleSubmit}>
+      <Form layout="vertical" onFinish={handleSubmit} initialValues={editable}>
         <Form.Item label="Amount" name="amount">
           <Input type="text"/>
         </Form.Item>
