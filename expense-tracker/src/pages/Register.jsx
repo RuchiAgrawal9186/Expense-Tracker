@@ -3,6 +3,7 @@ import { Link ,useNavigate} from 'react-router-dom'
 import {url} from "../url.js"
 import axios from "axios"
 import {message} from "antd"
+import Spinner from '../components/Spinner.jsx'
 
 const Register = () => {
 
@@ -28,18 +29,18 @@ const Register = () => {
         }
         try {
           setloading(true)
-          const response = await axios.post(`${url}/users/register`, obj);
-          const data = response.data;
+          await axios.post(`${url}/users/register`, obj);
           message.success("Register Successfully")
           navigate("/login");
           setloading(false)
         } catch (error) {
           setloading(false)
-          message.error("Not able Rrgister Something wrong.")
+          message.error("Not able Register Something wrong.")
         }
     }
   return (
     <>
+    {loading ? <Spinner/> : 
     <div className='register-page'>
         <h4 style={{textAlign:"center"}}>Register form</h4>
         <br />
@@ -61,7 +62,7 @@ const Register = () => {
         Already register ? click here to <Link to='/login'>Login</Link>
 
      </form>
-    </div>
+    </div>}
     </>
   )
 }

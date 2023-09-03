@@ -70,11 +70,11 @@ const HomePage = () => {
       const res = await axios.post(`${url}/transaction/getall`, { userid: user._id, frequency, selectedDate, type })
       setLoading(false)
       setalltransaction(res.data)
-      console.log(res.data)
+      // console.log(res.data)
 
 
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       message.error("Fetch Issue with Transaction")
     }
   }
@@ -82,6 +82,21 @@ const HomePage = () => {
 
 
   useEffect(() => {
+    const getAlltransaction = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"))
+        setLoading(true)
+        const res = await axios.post(`${url}/transaction/getall`, { userid: user._id, frequency, selectedDate, type })
+        setLoading(false)
+        setalltransaction(res.data)
+        // console.log(res.data)
+  
+  
+      } catch (error) {
+        // console.log(error)
+        message.error("Fetch Issue with Transaction")
+      }
+    }
     getAlltransaction()
   }, [frequency, selectedDate, type])
 
