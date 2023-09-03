@@ -32,3 +32,22 @@ code {
   padding: 15px 20px;
   box-shadow:  0 0 3px gray;
 }
+
+/* icons */
+.switch-icons{
+  border: 0 0 15px rgba(0, 0, 0, 0.678);
+  border-radius: 5px;
+  padding: 10px 15px;
+}
+
+.anticon svg{
+  font-size: 20px;
+  cursor: pointer;
+}
+.active-icon{
+  color: black;
+}
+.inactive-icon{
+  color:gray
+
+}

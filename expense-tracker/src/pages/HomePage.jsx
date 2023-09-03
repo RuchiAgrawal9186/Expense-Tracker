@@ -1,12 +1,11 @@
 import React,{useEffect, useState} from 'react'
 import {Modal,Form, Select, Input, message,Table,DatePicker} from "antd"
 import moment from "moment"
-import Header from '../components/Layout/Header'
-import Footer from '../components/Layout/Footer'
-
+import {UnorderedListOutlined,AreaChartOutlined} from "@ant-design/icons"
 import axios from 'axios'
 import { url } from '../url'
 import Spinner from '../components/Spinner'
+import Analytics from '../components/Analytics'
 const {RangePicker} = DatePicker;
 
 const HomePage = () => {
@@ -18,6 +17,7 @@ const HomePage = () => {
 
   const [selectedDate,setselectedDate] = useState([])
   const [type,settype]=useState("all")
+  const [viewdata,setviewdata]=useState("table")
 
   // table data 
 
@@ -107,12 +107,17 @@ const HomePage = () => {
           </Select>
          {frequency=="custom" && <RangePicker value={selectedDate} onChange={(values)=> setselectedDate(values)}></RangePicker>}
       </div>
+      <div className='switch-icons'>
+           <UnorderedListOutlined className={`mx-2 ${viewdata=="table"?"active-icon":"inactive-icon"}`} onClick={()=> setviewdata("table")}></UnorderedListOutlined>
+           <AreaChartOutlined className={`mx-2 ${viewdata=="analytics"?"active-icon":"inactive-icon"}`} onClick={()=> setviewdata("analytics")}></AreaChartOutlined>
+        </div>
       <div>
         <button className='btn btn-primary' onClick={()=> setshowModel(true)}>Add New</button>
       </div>
     </div>
     <div className='contents'>
-      <Table columns={colums} dataSource={alltranscrion}/>
+      {viewdata=="table" ? <Table columns={colums} dataSource={alltranscrion}/> : <Analytics alltransaction={alltranscrion}></Analytics>}
+      
     </div>
     <Modal title="Add Transaction" open={showModel} onCancel={()=> setshowModel(false)}
     footer={false}>
