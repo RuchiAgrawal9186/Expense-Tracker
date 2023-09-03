@@ -6,6 +6,10 @@ const dotenv = require("dotenv")
 const {connection} = require("./db.js")
 
 
+const {userRouter} = require("./routes/user.routes.js")
+const {transactionRouter}=require("./routes/transaction.routes.js")
+
+
 // rest object
 const app = express()
 
@@ -17,9 +21,12 @@ app.use(cors())
 
 // routes
 
-app.get("/",(req,res)=>{
-res.send("<h1>hello server</h1>")
-})
+// app.get("/",(req,res)=>{
+// res.send("<h1>hello server</h1>")
+// })
+
+app.use("/users",userRouter)
+app.use("/transaction",transactionRouter)
 
 //port
 
