@@ -1,1 +1,3 @@
-export const url = "https://expensebackend-w75d.onrender.com" 
+export const url = "https://expensetracker-backend-production-3fef.up.railway.app" 
+
+// https://expensebackend-w75d.onrender.com
