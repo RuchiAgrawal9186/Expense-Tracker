@@ -14,7 +14,7 @@ function App() {
     if (localStorage.getItem("user")) {
       setAuthenticated(true);
     }
-  }, [authenticated]);
+  }, []);
 
   return (
     <>
